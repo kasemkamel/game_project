@@ -10,16 +10,14 @@ from shapely import geometry
 from scipy.ndimage import label, find_objects
 import time
 
-# ==============================
-# CONFIGURATION
-# ==============================
+
 WIDTH, HEIGHT = 1024, 768
 MOUNTAIN_THRESHOLD = 0.23
 RIVER_THRESHOLD = -0.2
 NOISE_SCALE = 2
 SEED = 9423551
 NUM_POINTS = 150 
-SAVE_PREFIX = "map_model_v8_natural"
+SAVE_PREFIX = "map_model_v8"
 
 TERRAIN_TYPE = {
     'MOUNTAIN': 2,

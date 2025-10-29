@@ -1,0 +1,10 @@
+# requirements.txt
+pygame>=2.1
+shapely
+geojson
+numpy
+matplotlib
+scipy
+perlin_noise
+Pillow
+shapely
