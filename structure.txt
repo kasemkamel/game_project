@@ -1,0 +1,41 @@
+game/
+│
+├── main.py
+├── core/
+│   ├── engine.py
+│   ├── renderer.py
+│   ├── input_manager.py
+│   └── camera.py
+│
+│
+├── entities/
+│   ├── city.py
+│   ├── army.py
+│   ├── castle.py
+│   └── ...
+│
+├── systems/
+│   ├── pathfinding_system.py
+│   ├── trade_system.py
+│   ├── resource_system.py
+│   └── ...
+│
+├── ui/
+│   ├── hud.py
+│   ├── menus.py
+│   └── ...
+│
+└── assets/
+│   └── sounds/
+│   └── maps/
+│   └── icons/
+│
+└── README.md
+|
+└── requirements.txt
+|
+└── structure.txt
+|
+└── requirements.txt
+
+
