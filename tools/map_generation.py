@@ -9,7 +9,8 @@ from shapely.ops import unary_union, polygonize
 from shapely import geometry
 from scipy.ndimage import label, find_objects
 import time
-
+import os
+os.makedirs("../assets/maps", exist_ok=True)
 
 WIDTH, HEIGHT = 1024, 768
 MOUNTAIN_THRESHOLD = 0.23
@@ -18,7 +19,7 @@ NOISE_SCALE = 2
 SEED = 9423551
 NUM_POINTS = 150 
 SAVE_PREFIX = "map_model_v8"
-
+img_path = f"./assets/maps/{SAVE_PREFIX}.png"
 TERRAIN_TYPE = {
     'MOUNTAIN': 2,
     'LAND': 1,
@@ -264,17 +265,9 @@ def generate_map_model(seed=SEED):
             width = 1
             draw.line(coords, fill=color, width=width)
 
-
-    
-    # رسم المدن (فقط حيث يوجد موقع صالح)
-    for province in map_data:
-        if province["city_location"]:
-            cx, cy = province["city_location"]
-            draw.ellipse((cx-4, cy-4, cx+4, cy+4), fill=(255, 215, 0), outline=(0, 0, 0), width=1)
     
     # 9. حفظ المخرجات
-    img_path = f"{SAVE_PREFIX}.png"
-    img.save(img_path)
+
     
     # GeoJSON
     geojson_features = []
@@ -288,31 +281,35 @@ def generate_map_model(seed=SEED):
     
     geojson_data = {"type": "FeatureCollection", "features": geojson_features}
     # حفظ طبقة الجبال
-    with open("mountains.geojson", "w") as f:
+    with open("./assets/maps/mountains.geojson", "w") as f:
         json.dump({
             "type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
                 "geometry": geometry.mapping(mountain_union),
-                "properties": {"terrain": "mountain"}
+                "properties": {"terrain": "mountain", "blocks_position": True}
             }]
         }, f)
 
     # حفظ طبقة الأنهار
-    with open("rivers.geojson", "w") as f:
+    with open("./assets/maps/rivers.geojson", "w") as f:
         json.dump({
             "type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
                 "geometry": geometry.mapping(river_union),
-                "properties": {"terrain": "river"}
+                "properties": {"terrain": "river", "blocks_position": True}
             }]
         }, f)
 
-    geojson_path = f"{SAVE_PREFIX}.geojson"
+    geojson_path = f"./assets/maps/{SAVE_PREFIX}.geojson"
     with open(geojson_path, 'w') as f:
         json.dump(geojson_data, f, indent=2)
-    
+
+    # حفظ صورة الخريطة
+    img.save(img_path)
+
+    # 10. إكمال العملية
     end_time = time.time()
     print("=" * 60)
     print(f"✓ Map generation complete in {end_time - start_time:.2f} seconds!")

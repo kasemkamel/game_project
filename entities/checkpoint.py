@@ -3,8 +3,12 @@ import pygame
 from entities.base_entity import BaseEntity
 
 class Checkpoint(BaseEntity):
-    RADIUS = 6
+    RADIUS = 2
 
+    def __init__(self, x, y, owner=None):
+        super().__init__(x, y)
+        self.owner = owner
+    
     def draw(self, screen, camera):
         pos = camera.apply((self.x, self.y))
         pygame.draw.circle(screen, (240, 220, 60), pos, int(self.RADIUS * camera.zoom))

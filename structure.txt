@@ -1,3 +1,4 @@
+# structure.exe
 game/
 │
 ├── main.py
@@ -5,6 +6,8 @@ game/
 │   ├── engine.py
 │   ├── renderer.py
 │   ├── input_manager.py
+│   ├── game_loop.py
+│   ├── map_loader.py
 │   └── camera.py
 │
 │
@@ -12,23 +15,37 @@ game/
 │   ├── city.py
 │   ├── army.py
 │   ├── castle.py
+│   ├── base_entity.py
+│   ├── checkpoint.py
+│   ├── province.py
+│   ├── road.py
+│   ├── spy.py
+│   ├── terrain.py
 │   └── ...
 │
 ├── systems/
-│   ├── pathfinding_system.py
+│   ├── pathfinding.py
 │   ├── trade_system.py
 │   ├── resource_system.py
+│   ├── base_system.py
+│   ├── happiness_system.py
+│   ├── navigation.py
+│   ├── spy_system.py
+│   ├── training_system.py
 │   └── ...
 │
 ├── ui/
 │   ├── hud.py
-│   ├── menus.py
+│   ├── construction_ui.py
+│   ├── base_ui.py
 │   └── ...
 │
 └── assets/
 │   └── sounds/
 │   └── maps/
 │   └── icons/
+│   └── images/
+
 │
 └── README.md
 |

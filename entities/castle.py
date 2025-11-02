@@ -3,7 +3,13 @@ import pygame
 from entities.base_entity import BaseEntity
 
 class Castle(BaseEntity):
-    RADIUS = 10
+    RADIUS = 3
+    
+
+    def __init__(self, x, y, owner=None):
+        super().__init__(x, y, owner)
+        self.owner = owner
+        self.garrison = set()
 
     def draw(self, screen, camera):
         pos = camera.apply((self.x, self.y))
@@ -16,3 +22,6 @@ class Castle(BaseEntity):
 
     def __repr__(self):
         return "Castle"
+
+    def change_owner(self, new_owner):
+        self.owner = new_owner

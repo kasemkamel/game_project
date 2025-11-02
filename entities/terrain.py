@@ -1,31 +1,22 @@
-# entities/province.py
+# entities/terrain.py
 import pygame
 from shapely.geometry import Polygon as pol, Point
 
-class Province:
-    def __init__(self, points, color, props):
+
+class terrain:
+    def __init__(self, points, color):
         self.points = points
         self.color = color
-        self.province_id = props.get('province_id')
-        self.area = props.get('area')
-        self.is_coastal = props.get('is_coastal', False)
-        self.is_mountainous = props.get('is_mountainous', False)
         self.polygon = pol(points)
 
     def containsPoint(self, point):
         return self.polygon.contains(Point(point))
+
     
     def containsXY(self, x, y):
         return self.polygon.contains(Point(x, y))
-
+    
     def draw(self, screen, camera):
         scaled_points = [camera.apply(p) for p in self.points]
         pygame.draw.polygon(screen, self.color, scaled_points)
         pygame.draw.polygon(screen, (40, 40, 40), scaled_points, 1)  # Border
-    
-    def hover(self, screen, camera):
-        scaled_points = [camera.apply(p) for p in self.points]
-        pygame.draw.polygon(screen, (20,50,159), scaled_points, 3)
-    
-    def __repr__(self):
-        return f"province id {self.province_id}"
