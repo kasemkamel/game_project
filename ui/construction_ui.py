@@ -2,7 +2,7 @@ from .base_ui import BaseUI
 
 class ConstructionUI(BaseUI):
     """
-    واجهة المستخدم الخاصة بالبناء في المدن والقلاع.
+    UI component for managing construction options for selected entities.
     """
     def __init__(self, x, y, width, height, game_state=None):
         super().__init__(x, y, width, height)
@@ -10,20 +10,20 @@ class ConstructionUI(BaseUI):
         self.selected_entity = None
 
     def set_selected_entity(self, entity):
-        """تعيين الكيان المحدد لعرض خيارات البناء."""
+        """Set the selected entity to display construction options."""
         self.selected_entity = entity
         self.is_visible = (entity is not None)
 
     def draw(self, screen):
-        """رسم واجهة البناء."""
+        """Draw the construction UI."""
         if self.is_visible and self.selected_entity:
             print(f"  Drawing Construction UI for {self.selected_entity.name}")
-            # رسم قائمة المباني المتاحة
-            # رسم زر "بناء"
+            # Draw the list of available buildings
+            # Draw the "Build" button
             super().draw(screen)
 
     def handle_input(self, event):
-        """معالجة النقر على خيارات البناء."""
+        """Handle input for construction options."""
         if self.is_visible:
-            # منطق معالجة النقر على زر البناء
+            # Handle click on build button
             pass

@@ -20,13 +20,24 @@ class City(BaseEntity):
         dx, dy = pos[0] - self.x, pos[1] - self.y
         return dx * dx + dy * dy <= self.RADIUS ** 2
 
-    def expelling_an_army(self, army):
-        army.x = self.x + 10
-        army.y = self.y + 10
-        self.garrison.remove(army)
-        army.is_visible = True
-        army.target_entity = None
-        army.city = None
+    def expel_specific_army(self, army):
+        """Expel a specific army from the garrison"""
+        if army in self.garrison:
+            army.x = self.x + 10
+            army.y = self.y + 10
+            self.garrison.remove(army)
+            army.is_visible = True
+            army.target_entity = None
+            army.city = None
+            print(f"[City] Expelled {army} from {self.name}")
+            return True
+        else:
+            print(f"[City] Army {army} not found in garrison")
+            return False
+    
+    def get_garrison_list(self):
+        """Return a list of armies in the garrison"""
+        return list(self.garrison)
     
     def expelling_first_army(self):
         army = self.garrison.pop()

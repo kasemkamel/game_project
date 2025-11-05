@@ -34,7 +34,7 @@ print(f"[MapGen v8 - Natural Borders] Initializing: {WIDTH}x{HEIGHT}, Seed: {SEE
 
 def generate_terrain_maps(seed):
     """
-    يولد مصفوفات التضاريس باستخدام Perlin noise
+    Generates terrain maps using Perlin noise and saves them as images.
     """
     print("Step 1: Generating terrain using Perlin noise...")
     noise = PerlinNoise(octaves=6, seed=seed)
@@ -52,7 +52,7 @@ def generate_terrain_maps(seed):
 
 def terrain_to_polygons(terrain_map, terrain_type):
     """
-    يحول نوع تضاريس معين من مصفوفة إلى MultiPolygon
+    Converts a specific terrain type from the array to a MultiPolygon
     """
     print(f"Step 2: Converting terrain type '{terrain_type}' to polygons...")
     mask = (terrain_map == terrain_type).astype(np.uint8)
@@ -74,26 +74,26 @@ def terrain_to_polygons(terrain_map, terrain_type):
 
 def find_city_location(province_poly, land_union, mountain_union, river_union):
     """
-    يجد أفضل موقع للمدينة - فقط على الأرض الصالحة
+    Find the best location for a city - only on valid land areas within the province.
     """
-    # المنطقة الآمنة = المقاطعة ∩ الأرض - (الجبال ∪ الأنهار)
+    # safe_area = province ∩ land - (mountains ∪ rivers)
     safe_area = province_poly.intersection(land_union)
     safe_area = safe_area.difference(mountain_union).difference(river_union)
     
     if safe_area.is_empty or safe_area.area < 10:
-        # لا يوجد مكان آمن - لا تضع مدينة
+        # No safe location - do not place city
         return None
-    
-    # إذا كانت MultiPolygon، خذ أكبر جزء
+
+    # If MultiPolygon, take the largest part
     if isinstance(safe_area, MultiPolygon):
         safe_area = max(safe_area.geoms, key=lambda p: p.area)
-    
-    # المركز الهندسي
+
+    # Find the centroid of the safe area
     centroid = safe_area.centroid
     if safe_area.contains(centroid):
         return (int(centroid.x), int(centroid.y))
-    
-    # نقطة تمثيلية
+
+    # Find a representative point within the safe area
     rep_point = safe_area.representative_point()
     return (int(rep_point.x), int(rep_point.y))
 
@@ -109,10 +109,10 @@ def generate_map_model(seed=SEED):
     random.seed(seed)
     np.random.seed(seed)
 
-    # 1. توليد خريطة التضاريس
+    # 1. generate terrain map
     terrain_map = generate_terrain_maps(seed)
 
-    # 2. تحويل التضاريس إلى مضلعات
+        # 2. convert terrain types to polygons
     mountain_union = terrain_to_polygons(terrain_map, TERRAIN_TYPE['MOUNTAIN'])
     river_union = terrain_to_polygons(terrain_map, TERRAIN_TYPE['RIVER'])
     land_union = terrain_to_polygons(terrain_map, TERRAIN_TYPE['LAND'])
@@ -121,17 +121,17 @@ def generate_map_model(seed=SEED):
     print(f"   → Rivers: {river_union.area:.0f} px²")
     print(f"   → Land: {land_union.area:.0f} px²")
     
-    # 3. إنشاء مخطط Voronoi على كامل الخريطة
+    # 3. generate voronoi diagram over entire map
     print("Step 3: Generating Voronoi diagram on ENTIRE map...")
     
-    # اختيار نقاط عشوائية من كامل الخريطة
+    # generate random points
     points = np.random.rand(NUM_POINTS, 2)
     points[:, 0] *= WIDTH
     points[:, 1] *= HEIGHT
     
     vor = Voronoi(points)
     
-    # تحويل خطوط Voronoi إلى كائنات خطية
+    # extract voronoi lines
     voronoi_lines = []
     for line in vor.ridge_vertices:
         if -1 not in line:
@@ -142,23 +142,23 @@ def generate_map_model(seed=SEED):
         return
         
     voronoi_lines_union = unary_union(voronoi_lines)
-    
-    # 4. دمج خطوط Voronoi مع حدود الخريطة فقط
+
+    # 4. generate initial provinces
     print("Step 4: Creating initial provinces...")
     
     map_boundary = box(0, 0, WIDTH, HEIGHT).boundary
     
-    # فقط خطوط Voronoi + حدود الخريطة
+    # include map boundary to close polygons
     all_lines = unary_union([voronoi_lines_union, map_boundary])
     
-    # 5. تقسيم الخريطة إلى مقاطعات أولية
+    # 5. generate all polygons from voronoi lines
     all_polygons = list(polygonize(all_lines))
     print(f"   → Created {len(all_polygons)} initial polygons")
     
-    # 6. قص المقاطعات - إزالة ما هو داخل الجبال والأنهار
+    # 6. clipping provinces (removing mountains & rivers)
     print("Step 5: Clipping provinces (removing mountains & rivers)...")
     
-    # المناطق الممنوعة = الجبال + الأنهار
+    # generate forbidden area (mountains + rivers)
     forbidden_area = unary_union([mountain_union, river_union])
     mountain_Areas = unary_union([mountain_union])
     river_Areas = unary_union([river_union])
@@ -170,19 +170,19 @@ def generate_map_model(seed=SEED):
         if not poly.is_valid or poly.area < 100:
             continue
         
-        # قص المقاطعة - إزالة المناطق الممنوعة
+        # clip polygon with forbidden area
         clipped = poly.difference(forbidden_area)
         
-        # إذا اختفت المقاطعة تمامًا (كانت داخل جبل/نهر)
+        # if completely inside mountains/rivers
         if clipped.is_empty or clipped.area < 500:
             removed_count += 1
             continue
         
-        # إذا تم القص (كان هناك جزء داخل الجبال/الأنهار)
-        if clipped.area < poly.area * 0.95:  # فقدت أكثر من 5%
+        # check if clipped polygon is valid and has enough area
+        if clipped.area < poly.area * 0.95:  # less than 95% area remains
             clipped_count += 1
         
-        # التعامل مع MultiPolygon (قد ينتج عن القص عدة أجزاء)
+        # add valid clipped polygon(s) to list
         if isinstance(clipped, MultiPolygon):
             for geom in clipped.geoms:
                 if geom.is_valid and geom.area > 500:
@@ -199,7 +199,7 @@ def generate_map_model(seed=SEED):
         print("ERROR: No valid provinces after clipping!")
         return
     
-    # 7. معالجة كل مقاطعة ووضع المدن
+    # 7. process provinces and place cities
     print("Step 6: Processing provinces and placing cities...")
     final_provinces = []
     map_data = []
@@ -209,7 +209,7 @@ def generate_map_model(seed=SEED):
     for i, poly in enumerate(province_polygons):
         final_provinces.append(poly)
         
-        # تحديد موقع المدينة (قد يكون None إذا لم يكن هناك أرض صالحة)
+        # Find city location
         city_loc = find_city_location(poly, land_union, mountain_union, river_union)
         
         if city_loc:
@@ -230,9 +230,9 @@ def generate_map_model(seed=SEED):
     print(f"   → Cities placed: {cities_placed}")
     print(f"   → Cities skipped (no safe land): {cities_skipped}")
     
-    # 8. رسم الخريطة النهائية
+    # 8. draw final map
     print("Step 7: Drawing the final map...")
-    img = Image.new('RGB', (WIDTH, HEIGHT), (70, 130, 180))  # ماء
+    img = Image.new('RGB', (WIDTH, HEIGHT), (70, 130, 180))  # water background
     draw = ImageDraw.Draw(img)
     
     def draw_geometry(geom, fill_color):
@@ -248,16 +248,16 @@ def generate_map_model(seed=SEED):
                 for interior in geom.interiors:
                     draw.polygon(list(interior.coords), fill=(70, 130, 180))
     
-    # رسم الأرض
-    draw_geometry(land_union, (60, 180, 75))  # أخضر
+    #draw land
+    draw_geometry(land_union, (60, 180, 75))  # green
     
-    # رسم الأنهار
-    draw_geometry(river_union, (70, 130, 180))  # أزرق
-    
-    # رسم الجبال
-    draw_geometry(mountain_union, (139, 137, 137))  # رمادي
-    
-    # رسم حدود المقاطعات (الآن بحدود طبيعية!)
+    # draw rivers
+    draw_geometry(river_union, (70, 130, 180))  # blue
+
+    # draw mountains
+    draw_geometry(mountain_union, (139, 137, 137))  # gray
+
+    # draw province borders (now with natural borders!)
     for i, poly in enumerate(final_provinces):
         if poly.exterior:
             coords = list(poly.exterior.coords)
@@ -265,8 +265,7 @@ def generate_map_model(seed=SEED):
             width = 1
             draw.line(coords, fill=color, width=width)
 
-    
-    # 9. حفظ المخرجات
+    # 9. save outputs
 
     
     # GeoJSON
@@ -280,7 +279,7 @@ def generate_map_model(seed=SEED):
         geojson_features.append(feature)
     
     geojson_data = {"type": "FeatureCollection", "features": geojson_features}
-    # حفظ طبقة الجبال
+    # save mountain layer
     with open("./assets/maps/mountains.geojson", "w") as f:
         json.dump({
             "type": "FeatureCollection",
@@ -291,7 +290,7 @@ def generate_map_model(seed=SEED):
             }]
         }, f)
 
-    # حفظ طبقة الأنهار
+    # save river layer
     with open("./assets/maps/rivers.geojson", "w") as f:
         json.dump({
             "type": "FeatureCollection",
@@ -306,10 +305,10 @@ def generate_map_model(seed=SEED):
     with open(geojson_path, 'w') as f:
         json.dump(geojson_data, f, indent=2)
 
-    # حفظ صورة الخريطة
+    # save map image
     img.save(img_path)
 
-    # 10. إكمال العملية
+    # 10. done
     end_time = time.time()
     print("=" * 60)
     print(f"✓ Map generation complete in {end_time - start_time:.2f} seconds!")

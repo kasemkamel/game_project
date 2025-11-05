@@ -1,3 +1,4 @@
+# core/map_loader.py
 import json
 import os
 from entities.terrain import terrain

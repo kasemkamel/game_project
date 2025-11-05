@@ -2,15 +2,15 @@
 
 class BaseSystem:
     """
-    الفئة الأساسية لجميع أنظمة اللعبة.
+    base system class for game systems.
     """
     def __init__(self, game_state):
         self.game_state = game_state
 
     def update_20hz(self):
-        """تحديث النظام بمعدل 20 هرتز (كل إطار)."""
+        """update the system at 20Hz (20 times per second)."""
         pass
 
     def update_per_4_min(self):
-        """تحديث النظام بمعدل مرة كل 4دقائق)."""
+        """update the system every 4 minutes."""
         pass

@@ -14,6 +14,8 @@ game/
 ├── entities/
 │   ├── city.py
 │   ├── army.py
+│   ├── commander.py
+│   ├── assistant.py
 │   ├── castle.py
 │   ├── base_entity.py
 │   ├── checkpoint.py
@@ -24,6 +26,7 @@ game/
 │   └── ...
 │
 ├── systems/
+│   ├── actions_system.py
 │   ├── pathfinding.py
 │   ├── trade_system.py
 │   ├── resource_system.py
@@ -38,6 +41,10 @@ game/
 │   ├── hud.py
 │   ├── construction_ui.py
 │   ├── base_ui.py
+│   ├── garrison_dialog.py
+│   ├── loading_screen.py
+│   ├── actions_panel.py
+│   ├── tooltip.py
 │   └── ...
 │
 └── assets/
@@ -45,14 +52,13 @@ game/
 │   └── maps/
 │   └── icons/
 │   └── images/
-
 │
-└── README.md
-|
-└── requirements.txt
-|
+│
+│
+│
+│
+├── README.md
+├── requirements.txt
 └── structure.txt
-|
-└── requirements.txt
 
 

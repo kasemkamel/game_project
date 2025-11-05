@@ -19,6 +19,22 @@ class Castle(BaseEntity):
     def is_clicked(self, pos):
         dx, dy = pos[0] - self.x, pos[1] - self.y
         return dx * dx + dy * dy <= self.RADIUS ** 2
+    
+    def expelling_an_army(self, army):
+        army.x = self.x + 10
+        army.y = self.y + 10
+        self.garrison.remove(army)
+        army.is_visible = True
+        army.target_entity = None
+        army.city = None
+    
+    def expelling_first_army(self):
+        army = self.garrison.pop()
+        army.x = self.x + 10
+        army.y = self.y + 10
+        army.is_visible = True
+        army.target_entity = None
+        army.city = None
 
     def __repr__(self):
         return "Castle"

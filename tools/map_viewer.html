@@ -182,39 +182,39 @@
 </head>
 <body>
     <div id="sidebar">
-        <h1>🗺️ مستكشف الخرائط</h1>
-        
+        <h1>🗺️ </h1>GeoJSON map viewer</h1>
+
         <div class="stats" id="mapStats">
-            <h3>📊 إحصائيات الخريطة</h3>
+            <h3>📊 Statistics</h3>
             <div class="stat-row">
-                <span class="stat-label">عدد المقاطعات:</span>
+                <span class="stat-label">Total Provinces:</span>
                 <span class="stat-value" id="totalProvinces">0</span>
             </div>
             <div class="stat-row">
-                <span class="stat-label">المدن:</span>
+                <span class="stat-label">Cities:</span>
                 <span class="stat-value" id="totalCities">0</span>
             </div>
             <div class="stat-row">
-                <span class="stat-label">مقاطعات ساحلية:</span>
+                <span class="stat-label">Coastal Provinces:</span>
                 <span class="stat-value" id="coastalCount">0</span>
             </div>
             <div class="stat-row">
-                <span class="stat-label">مقاطعات جبلية:</span>
+                <span class="stat-label">Mountain Provinces:</span>
                 <span class="stat-value" id="mountainCount">0</span>
             </div>
         </div>
         
         <div id="controls">
-            <h3 style="color: #764ba2; margin-bottom: 10px;">🎮 التحكم</h3>
-            <button onclick="findLargestProvince()">🏆 أكبر مقاطعة</button>
-            <button onclick="findSmallestProvince()">🔍 أصغر مقاطعة</button>
-            <button onclick="showCoastalProvinces()">🌊 المقاطعات الساحلية</button>
-            <button onclick="showMountainProvinces()">⛰️ المقاطعات الجبلية</button>
-            <button onclick="resetView()">🔄 إعادة تعيين</button>
+            <h3 style="color: #764ba2; margin-bottom: 10px;">🎮 Controls</h3>
+            <button onclick="findLargestProvince()">🏆 Largest Province</button>
+            <button onclick="findSmallestProvince()">🔍 Smallest Province</button>
+            <button onclick="showCoastalProvinces()">🌊 Coastal Provinces</button>
+            <button onclick="showMountainProvinces()">⛰️ Mountain Provinces</button>
+            <button onclick="resetView()">🔄 Reset</button>
         </div>
         
         <div class="info-box" id="provinceInfo" style="display: none;">
-            <h3>📍 معلومات المقاطعة</h3>
+            <h3>📍 Province Information</h3>
             <div id="provinceDetails"></div>
         </div>
     </div>
@@ -222,8 +222,8 @@
     <div id="mapContainer">
         <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
             <input type="file" id="fileInput" accept=".geojson,.json" onchange="loadGeoJSON(event)">
-            <h2 style="color: white; margin-bottom: 10px;">📁 اسحب ملف GeoJSON هنا</h2>
-            <p style="color: rgba(255,255,255,0.8);">أو اضغط لاختيار ملف</p>
+            <h2 style="color: white; margin-bottom: 10px;">📁 Drag and drop GeoJSON file here</h2>
+            <p style="color: rgba(255,255,255,0.8);">Or click to select a file</p>
         </div>
         <canvas id="mapCanvas" width="1024" height="768" style="display: none;"></canvas>
     </div>
@@ -247,7 +247,7 @@
                     document.getElementById('mapCanvas').style.display = 'block';
                     initializeMap();
                 } catch (error) {
-                    alert('خطأ في قراءة الملف: ' + error.message);
+                    alert('Error reading file: ' + error.message);
                 }
             };
             reader.readAsText(file);
@@ -283,12 +283,12 @@
 
         function drawMap() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // رسم الخلفية (ماء)
+
+            // draw background (water)
             ctx.fillStyle = '#4682b4';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // رسم المقاطعات
+            // draw provinces
             mapData.features.forEach((feature, index) => {
                 drawProvince(feature, index);
             });
@@ -305,28 +305,28 @@
             }
             ctx.closePath();
 
-            // اللون حسب النوع
-            let fillColor = '#3cb371'; // أخضر (أرض عادية)
-            
+            // color by type
+            let fillColor = '#3cb371'; // green (plain land)
+
             if (highlightedProvinces.has(index)) {
-                fillColor = '#ffd700'; // ذهبي للتمييز
+                fillColor = '#ffd700'; // gold (highlighted)
             } else if (selectedProvince === index) {
-                fillColor = '#ff6b6b'; // أحمر للمحدد
+                fillColor = '#ff6b6b'; // red (selected)
             } else if (props.is_mountainous) {
-                fillColor = '#8b8b8b'; // رمادي (جبال)
+                fillColor = '#8b8b8b'; // gray (mountains)
             } else if (props.is_coastal) {
-                fillColor = '#87ceeb'; // أزرق فاتح (ساحلي)
+                fillColor = '#87ceeb'; // light blue (coastal)
             }
 
             ctx.fillStyle = fillColor;
             ctx.fill();
 
-            // الحدود
+            // borders
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // رسم المدينة
+            // draw city
             if (props.city_location) {
                 const [cx, cy] = props.city_location;
                 ctx.beginPath();
@@ -390,22 +390,22 @@
             const details = document.getElementById('provinceDetails');
             
             let badges = '';
-            if (props.is_coastal) badges += '<span class="badge badge-coastal">ساحلي</span>';
-            if (props.is_mountainous) badges += '<span class="badge badge-mountain">جبلي</span>';
-            if (props.has_city) badges += '<span class="badge badge-city">مدينة</span>';
-            
+            if (props.is_coastal) badges += '<span class="badge badge-coastal">Coastal</span>';
+            if (props.is_mountainous) badges += '<span class="badge badge-mountain">Mountainous</span>';
+            if (props.has_city) badges += '<span class="badge badge-city">City</span>';
+
             details.innerHTML = `
                 <div class="info-item">
-                    <strong>المقاطعة:</strong> #${props.province_id}
+                    <strong>Province:</strong> #${props.province_id}
                 </div>
                 <div class="info-item">
-                    <strong>المدينة:</strong> ${props.city_name || 'لا يوجد'}
+                    <strong>City:</strong> ${props.city_name || 'None'}
                 </div>
                 <div class="info-item">
-                    <strong>المساحة:</strong> ${Math.round(props.area)} بكسل²
+                    <strong>Area:</strong> ${Math.round(props.area)} px²
                 </div>
                 <div class="info-item">
-                    <strong>الموقع:</strong> ${props.city_location ? `(${props.city_location[0]}, ${props.city_location[1]})` : 'لا يوجد'}
+                    <strong>Location:</strong> ${props.city_location ? `(${props.city_location[0]}, ${props.city_location[1]})` : 'None'}
                 </div>
                 <div class="info-item">
                     ${badges}
@@ -434,7 +434,7 @@
                 selectedProvince = largestIndex;
                 showProvinceInfo(largest);
                 drawMap();
-                alert(`أكبر مقاطعة: ${largest.properties.city_name }\nالمساحة: ${Math.round(maxArea)} بكسل²`);
+                alert(`Largest Province: ${largest.properties.city_name }\nArea: ${Math.round(maxArea)} px²`);
             }
         }
 
@@ -455,7 +455,7 @@
                 selectedProvince = smallestIndex;
                 showProvinceInfo(smallest);
                 drawMap();
-                alert(`أصغر مقاطعة: ${smallest.properties.city_name || 'بدون اسم'}\nالمساحة: ${Math.round(minArea)} بكسل²`);
+                alert(`Smallest Province: ${smallest.properties.city_name || 'None'}\nArea: ${Math.round(minArea)} px²`);
             }
         }
 
@@ -486,7 +486,7 @@
             drawMap();
         }
 
-        // السحب والإفلات
+        // Drag and drop support
         const uploadArea = document.getElementById('uploadArea');
         
         uploadArea.addEventListener('dragover', (e) => {

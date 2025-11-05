@@ -1,0 +1,7 @@
+{
+    "Codegeex.RepoIndex": true,
+    "Codegeex.GenerationPreference": "automatic",
+    "Codegeex.SidebarUI.LanguagePreference": "English",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.typeCheckingMode": "off"
+}

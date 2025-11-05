@@ -8,6 +8,9 @@ class BaseEntity:
 
     def is_clicked(self, pos):
         raise NotImplementedError
+    
+    def get_available_actions(self):
+        raise NotImplementedError
 
     def draw(self, screen, camera):
         scaled_points = [camera.apply(p) for p in self.points]

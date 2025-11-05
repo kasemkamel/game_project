@@ -2,7 +2,7 @@
 
 class BaseUI:
     """
-    الفئة الأساسية لعناصر واجهة المستخدم.
+    base class for UI elements.
     """
     def __init__(self, x, y, width, height):
         self.x = x
@@ -12,11 +12,11 @@ class BaseUI:
         self.is_visible = True
 
     def draw(self, screen):
-        """رسم عنصر واجهة المستخدم على الشاشة."""
+        """Draw the UI element on the screen."""
         if self.is_visible:
-            # منطق الرسم الوهمي
+            # Drawing logic here
             print(f"  Drawing {self.__class__.__name__} at ({self.x}, {self.y})")
 
     def handle_input(self, event):
-        """معالجة مدخلات المستخدم الخاصة بعنصر واجهة المستخدم."""
+        """Handle user input for the UI element."""
         pass
